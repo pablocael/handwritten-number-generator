@@ -1,10 +1,31 @@
 from collections.abc import Iterable
-from typing import Tuple
+from typing import Tuple, Iterable
+import helpers
 import numpy as np
+from mnist import MNIST
 
-# class ImageGenerator:
+class ImageGenerator:
 
-#     def generate()
+    def generate_from_data(data: Iterable) -> np.ndarray:
+        pass
+
+
+class NumberSequenceGenerator(ImageGenerator):
+
+    def __init__(self, spacing_range: Tuple[int, int], output_image_width: int):
+
+        self._spacing_range = spacing_range
+        self._output_image_width = output_image_width
+
+    def _load_static_digits_dataset(self):
+
+        data = MNIST('../data')
+        images, labels = mndata.load_training()
+
+    def generate_from_data(self, data: Iterable):
+        pass
+
+
 
 def generate_numbers_sequence(digits: Iterable[int], spacing_range: Tuple[int, int], image_width: int) -> np.ndarray:
     """
