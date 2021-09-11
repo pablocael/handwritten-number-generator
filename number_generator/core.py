@@ -42,11 +42,13 @@ class DigitImageDataset:
         # store sample image shape as (width, height)
         self._sample_shape = images.shape[1:][::-1]
 
-
     def get_digit_examples(self, digit: int) -> np.ndarray:
         """
         Retrieve all examples for the given digit
         """
+
+        if digit not in self._digit_examples:
+            return np.array()
 
         return self._digit_examples[digit]
 
@@ -60,6 +62,71 @@ class DigitImageDataset:
 
     def get_example_shape(self) -> Tuple[int, int]:
         return self._sample_shape
+
+
+class DigitImageDatasetAugmentator(DigitImageDataset):
+    """
+    A special digit dataset that will augment the data by using digit deformation
+    """
+    __accepted_augmentation_methods = [
+        'elastic',
+        'affine'
+    ]
+    def __init__(self, labels: np.array, images: np.ndarray, percent_augmentation: float, augmentation_method='elastic'):
+
+        if augmentation_method not in DigitImageDatasetAugmentator.__accepted_augmentation_methods:
+            raise ValueError(f'augmentation_method must be one of the following: {DigitImageDatasetAugmentator.__accepted_augmentation_methods}')
+
+        super(DigitImageDatasetAugmentator, self).__init__(labels, images)
+        """
+        Construct a digit dataset from list of examples and labels and augments the data
+
+        Parameters
+        ----------
+
+        labels:
+        a np.array of type uint8 storing each image digit example label
+
+        images:
+        digit examples in a numpy array with format (N, height, width), where N is the number of examples
+
+
+        labels length and images.shape[0] must have same size
+
+        percent_augmentation:
+        the percentage, related to original dataset size, of new examples to generate
+
+        augmentation_method:
+        the augmentation method to use.
+        - elastic: augment digits by deforming it's shape by using an non-rigid transformation
+        - affine: translates and rotates each digit randomly
+        """
+
+        self._percent_augmentation = percent_augmentation
+        self._augmentation_method = augmentation_method
+
+        # create a dictionary to store classes examples
+        self._digit_examples = {}
+        for i in range(10):
+            mask = labels == i
+            self._digit_examples[i] = images[mask]
+
+        # store sample image shape as (width, height)
+        self._sample_shape = images.shape[1:][::-1]
+
+        self._generate_augmented_examples()
+
+
+    def augment_from_digit_dataset(self, digit_dataset: DigitImageDataset) -> DigitImageDataset:
+        """
+        Load and generate dataset augmentation from an existing digit_dataset
+        """
+        pass
+
+    def _generate_augmented_examples(self):
+
+        # basic idea: go to each class and generate self._percent_augmentation new examples using elastic method
+        pass
 
 class ImageGenerator:
 
