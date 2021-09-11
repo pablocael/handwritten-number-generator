@@ -2,6 +2,10 @@ from collections.abc import Iterable
 from typing import Tuple
 import numpy as np
 
+# class ImageGenerator:
+
+#     def generate()
+
 def generate_numbers_sequence(digits: Iterable[int], spacing_range: Tuple[int, int], image_width: int) -> np.ndarray:
     """
     Generate an image that contains the sequence of given numbers, spaced
