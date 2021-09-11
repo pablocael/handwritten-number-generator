@@ -6,7 +6,7 @@ from typing import Tuple
 import numpy as np
 
 
-def calculate_bbox_from_binary_image(binary_image: np.array) -> Tuple[int, int, int, int]:
+def calculate_binary_image_contents_bbox(binary_image: np.array) -> Tuple[int, int, int, int]:
     """
         Extracts a bounding box from a binary image of format numpy.uint8, where relevant content has value > 0 (signal)
         and background has value 0.

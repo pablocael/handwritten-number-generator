@@ -1,11 +1,11 @@
 from number_generator import helpers
 import numpy as np
 
-def test_helpers_calculate_bbox_from_binary_image():
+def test_helpers_calculate_binary_image_contents_bbox():
 
     # create an empty image
     empty_image = np.zeros((28, 28), dtype=np.uint8)
-    bbox = helpers.calculate_bbox_from_binary_image(empty_image)
+    bbox = helpers.calculate_binary_image_contents_bbox(empty_image)
 
     # bbox of empty image (background only) should be all zeros
     assert bbox == (0, 0, 0, 0)
@@ -16,7 +16,7 @@ def test_helpers_calculate_bbox_from_binary_image():
     simple_bounds[45,42] = 200
 
 
-    bbox = helpers.calculate_bbox_from_binary_image(simple_bounds)
+    bbox = helpers.calculate_binary_image_contents_bbox(simple_bounds)
 
     # bbox of empty image (background only) should be all zeros
     assert bbox == (12, 10, 42, 45)
@@ -27,7 +27,7 @@ def test_helpers_calculate_bbox_from_binary_image():
     simple_bounds[99, 99] = 200
 
 
-    bbox = helpers.calculate_bbox_from_binary_image(simple_bounds)
+    bbox = helpers.calculate_binary_image_contents_bbox(simple_bounds)
 
     # bbox of empty image (background only) should be all zeros
     assert bbox == (0, 0, 99, 99)
