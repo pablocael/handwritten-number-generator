@@ -72,9 +72,9 @@ if __name__ == '__main__':
     ]
 
     print()
-    print(f'---------------------------')
-    print(f'Digits sequence generator')
-    print(f'---------------------------')
+    print(f'---------------------------------')
+    print(f'Phone numbers dataset generator')
+    print(f'---------------------------------')
 
     print(f'Creating phone numbers like database with {num_images} examples, this might take a few moments ...')
 
@@ -90,14 +90,13 @@ if __name__ == '__main__':
             generate_image = generate_numbers_sequence(sequence, spacing_range=(min_spacing, max_spacing), image_width=image_width)
             images.append(generate_image)
 
-        print('images type', images[0].dtype)
         dataset = GenericDataset(labels, images)
 
         output_filename = os.path.join(output_path, f'phonenumbers-handwritten-dataset-{num_images}.pickle')
 
         # add some metadata to be able to make sense of this dataset later
         metadata = {
-            'generate_timestamp': time.time(),
+            'creation_timestamp': time.time(),
             'spacing_range': (min_spacing, max_spacing),
             'image_width': image_width
         }
