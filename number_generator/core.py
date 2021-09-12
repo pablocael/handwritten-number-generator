@@ -1,3 +1,4 @@
+import os
 import sys
 from collections.abc import Iterable
 import logging
@@ -15,7 +16,8 @@ logger = logging.getLogger(__name__)
 this = sys.modules[__name__]
 
 # will be loaded on demand, first time needed
-this._DIGITS_DATASET_FILEPATH = 'data/digits-dataset.pickle'
+
+this._DIGITS_DATASET_FILEPATH = os.path.join(sys.prefix, 'data/digits-dataset.pickle')
 this._DIGITS_DATASET = None
 
 class GenericDataset:
@@ -285,7 +287,10 @@ class DigitSequenceImageGenerator(ImageGenerator):
         result = np.hstack(intermediate_result_images)
 
         # finally, rescale to desired output width
-        return helpers.rescale_to_width(result, self._output_image_width)
+        rescaled = helpers.rescale_to_width(result, self._output_image_width)
+
+        # invert colors to make white background
+        return 255 - rescaled
 
 def get_or_load_digits_dataset():
 

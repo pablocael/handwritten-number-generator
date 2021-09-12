@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Generate an image of handwritten digit sequences from an input string containing digit characters 0-9.
 """

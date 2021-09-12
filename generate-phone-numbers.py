@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Generate a dataset of randomly generated handwritten telephone numbers using Japanese telephone number format.
 
