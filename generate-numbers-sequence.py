@@ -72,7 +72,7 @@ if __name__ == '__main__':
             im = im.convert('RGB')
         im.save(filename)
         end_time = time.time()
-        print(f'Image saved successfully to {filename}, proccess took {end_time-start_time:.1f} seconds...')
+        print(f'Image of dimensions {im.width} x {im.height} generated successfully at "{filename}", proccess took {end_time-start_time:.1f} seconds...')
 
     except Exception as e:
         print('an error occurred while trying to synthesize digit image:', e)
