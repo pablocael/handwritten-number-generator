@@ -5,5 +5,10 @@ Python package for generating handwritten digits for an input number sequence or
 Module functionalities:
 
 
+- Write about output filename of individual sequence
+- Write about output database format of generated dataset
+- 
+
+
 
 

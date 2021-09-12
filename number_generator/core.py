@@ -1,3 +1,4 @@
+import sys
 from collections.abc import Iterable
 import logging
 from typing import Iterable, Tuple
@@ -10,21 +11,29 @@ from . import helpers
 
 logger = logging.getLogger(__name__)
 
+# this is a pointer to the module object instance itself.
+this = sys.modules[__name__]
+
+# will be loaded on demand, first time needed
+this._DIGITS_DATASET_FILEPATH = 'data/digits-dataset.pickle'
+this._DIGITS_DATASET = None
 
 class GenericDataset:
 
-    def __init__(self, labels, images):
+    def __init__(self, labels=None, images=None, metadata=None):
         """
         A generic dataset that can store and retrieve examples and labels
         """
 
-        self._labels = labels
-        self._images = images
+        self._labels = labels or []
+        self._images = images or []
+        self._metadata = metadata or {}
 
-    def save(self, output_filepath):
+    def save(self, output_filepath, metadata=None):
         data = {
             'labels': self._labels,
-            'images': self._images
+            'images': self._images,
+            'metadata': metadata
         }
         with open(output_filepath, 'wb') as handle:
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -39,6 +48,13 @@ class GenericDataset:
 
         self._labels = data['labels']
         self._images = data['images']
+
+        self._metadata = {}
+        if 'metadata' in data:
+            self._metadata = data['metadata']
+
+    def get_metadata(self):
+        return self._metadata
 
     def __len__(self):
         return len(self._labels)
@@ -223,7 +239,7 @@ class DigitSequenceImageGenerator(ImageGenerator):
         self._output_image_width = output_image_width
 
     def _generate_blank_block(self, width: int, height: int) -> np.ndarray:
-        return np.zeros((height, width))
+        return np.zeros((height, width), dtype=np.uint8)
 
     def _generate_random_space_block(self) -> np.ndarray:
         """
@@ -271,11 +287,13 @@ class DigitSequenceImageGenerator(ImageGenerator):
         # finally, rescale to desired output width
         return helpers.rescale_to_width(result, self._output_image_width)
 
-def load_mnist_digit_dataset():
+def get_or_load_digits_dataset():
 
-    ds = DigitImageDataset()
-    ds.load('./data/mnist.pickle')
-    return ds
+    if this._DIGITS_DATASET is None:
+        this._DIGITS_DATASET = DigitImageDataset()
+        this._DIGITS_DATASET.load(_DIGITS_DATASET_FILEPATH)
+
+    return this._DIGITS_DATASET
 
 def generate_numbers_sequence(digits: Iterable[int], spacing_range: Tuple[int, int], image_width: int) -> np.ndarray:
     """
@@ -302,11 +320,12 @@ def generate_numbers_sequence(digits: Iterable[int], spacing_range: Tuple[int, i
     1 (white), the first dimension corresponding to the height and the second
     dimension to the width.
     """
-    # Create the dataset using MNIST
-    mnist_dataset = load_mnist_digit_dataset()
+
+    # load digits dataset
+    digits_dataset = get_or_load_digits_dataset()
 
     # Generate the synthetic sequence using the digit dataset created
-    digit_sequence_generator = DigitSequenceImageGenerator(mnist_dataset, spacing_range=spacing_range, output_image_width=image_width)
+    digit_sequence_generator = DigitSequenceImageGenerator(digits_dataset, spacing_range=spacing_range, output_image_width=image_width)
 
     return digit_sequence_generator.generate_from_data(digits)
 
