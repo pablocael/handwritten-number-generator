@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 import logging
 from typing import Iterable, Tuple
-
+import pickle
 import numpy as np
 
 from mnist import MNIST
@@ -11,12 +11,47 @@ from . import helpers
 logger = logging.getLogger(__name__)
 
 
-class DigitImageDataset:
+class GenericDataset:
+
+    def __init__(self, labels, images):
+        """
+        A generic dataset that can store and retrieve examples and labels
+        """
+
+        self._labels = labels
+        self._images = images
+
+    def save(self, output_filepath):
+        data = {
+            'labels': self._labels,
+            'images': self._images
+        }
+        with open(output_filepath, 'wb') as handle:
+            pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    def load(self, input_filepath):
+        data = None
+        with open(input_filepath, 'rb') as handle:
+            data = pickle.load(handle)
+
+        if 'labels' not in data or 'images' not in data:
+            raise Exception(f'loaded dataset at {input_filepath} is not a valid GenericDataset')
+
+        self._labels = data['labels']
+        self._images = data['images']
+
+    def __len__(self):
+        return len(self._labels)
+
+    def __getitem__(self, index):
+        return self._images[index], self._labels[index]
+
+
+class DigitImageDataset(GenericDataset):
     """
-    DigitImageDataset class.
     Stores image examples for digits in interval [0,9].
     """
-    def __init__(self, labels: np.array, images: np.ndarray):
+    def __init__(self, labels: np.array = None, images: np.ndarray = None):
         """
         Construct a digit dataset from list of examples and labels
 
@@ -32,6 +67,13 @@ class DigitImageDataset:
 
         labels length and images.shape[0] must have same size
         """
+        if labels is None or images is None:
+            return
+
+        super(DigitImageDataset, self).__init__(labels=labels, images=images)
+        self._initialize_digits_set(labels=labels, images=images)
+
+    def _initialize_digits_set(self, labels: np.array, images: np.ndarray):
 
         # create a dictionary to store classes examples
         self._digit_examples = {}
@@ -48,7 +90,7 @@ class DigitImageDataset:
         """
 
         if digit not in self._digit_examples:
-            return np.array()
+            return np.ndarray()
 
         return self._digit_examples[digit]
 
@@ -63,6 +105,10 @@ class DigitImageDataset:
     def get_example_shape(self) -> Tuple[int, int]:
         return self._sample_shape
 
+    def load(self, input_filepath):
+        super(DigitImageDataset, self).load(input_filepath)
+
+        self._initialize_digits_set(labels=self._labels, images=self._images)
 
 class DigitImageDatasetAugmentator(DigitImageDataset):
     """
@@ -223,22 +269,9 @@ class DigitSequenceImageGenerator(ImageGenerator):
 
 def load_mnist_digit_dataset():
 
-    data = MNIST(path='./data/', return_type='numpy', gz=True)
-    test_imgs, test_labels = data.load_testing()
-    train_imgs, train_labels = data.load_training()
-
-    # gather all images from both train and test
-    images = np.concatenate([test_imgs, train_imgs], axis=0)
-    labels = np.concatenate([test_labels, train_labels], axis=0)
-
-    # assume images have equal dimensions in 0 and 1 axis
-    image_dim_size = int(np.sqrt(images.shape[1]))
-
-    # reshape to square dimension instead of single array data
-    images = np.uint8(images).reshape(-1, image_dim_size, image_dim_size)
-
-    return DigitImageDataset(labels, images)
-
+    ds = DigitImageDataset()
+    ds.load('./data/mnist.pickle')
+    return ds
 
 def generate_numbers_sequence(digits: Iterable[int], spacing_range: Tuple[int, int], image_width: int) -> np.ndarray:
     """

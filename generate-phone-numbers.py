@@ -14,6 +14,8 @@ arggroup.add_argument('--max-spacing', dest='max_spacing', type=int,
                     help='The maximum spacing to use between consecutive digits', required=True)
 arggroup.add_argument('--image-width', dest='image_width', type=int,
                     help='The output image width of each generated example in the generated dataset', required=True)
+arggroup.add_argument('--num-images', dest='num_images', type=int,
+                    help='The number of images to generate within the dataset', required=True)
 arggroup.add_argument('--output-path', dest='output_path', type=str,
                     help='The path where to store the genereate dataset images', required=True)
 
@@ -23,6 +25,7 @@ try:
     max_spacing = args.max_spacing
     image_width = args.image_width
     output_path = args.output_path
+    num_images = args.num_images
 
 except ValueError as ve:
     print(ve)

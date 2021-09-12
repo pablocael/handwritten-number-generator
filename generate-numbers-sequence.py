@@ -1,5 +1,11 @@
+"""
+Generate an image of handwritten digit sequences from an input string containing digit characters 0-9.
+"""
+
 import os
 import sys
+import time
+from PIL import Image
 import argparse
 from number_generator import generate_numbers_sequence
 
@@ -49,6 +55,26 @@ if __name__ == '__main__':
     filename = f'{filename}.png'
 
     digits = [int(c) for c in sequence]
-    output_image = generate_numbers_sequence(digits=digits, spacing_range=(min_spacing, max_spacing), image_width=image_width)
 
+    print()
+    print(f'---------------------------')
+    print(f'Digits sequence generator')
+    print(f'---------------------------')
 
+    print(f'Synthesizing image for digits sequence "{sequence}" ...')
+
+    try:
+        start_time = time.time()
+        output_image = generate_numbers_sequence(digits=digits, spacing_range=(min_spacing, max_spacing), image_width=image_width)
+
+        im = Image.fromarray(output_image)
+        if im.mode != 'RGB':
+            im = im.convert('RGB')
+        im.save(filename)
+        end_time = time.time()
+        print(f'Image saved successfully to {filename}, proccess took {end_time-start_time:.1f} seconds...')
+        print()
+
+    except Exception as e:
+        print('an error occurred while trying to synthesize digit image:', e)
+        print('please contact pablo.cael@gmail.com for support')
