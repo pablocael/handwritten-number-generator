@@ -73,8 +73,9 @@ if __name__ == '__main__':
         im.save(filename)
         end_time = time.time()
         print(f'Image saved successfully to {filename}, proccess took {end_time-start_time:.1f} seconds...')
-        print()
 
     except Exception as e:
         print('an error occurred while trying to synthesize digit image:', e)
         print('please contact pablo.cael@gmail.com for support')
+
+    print()

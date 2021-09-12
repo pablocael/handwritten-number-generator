@@ -4,7 +4,7 @@ from typing import Iterable, Tuple
 import pickle
 import numpy as np
 
-from mnist import MNIST
+from PIL import Image
 
 from . import helpers
 
@@ -236,6 +236,7 @@ class DigitSequenceImageGenerator(ImageGenerator):
         space_width = np.random.randint(self._spacing_range[0], self._spacing_range[1]+1)
         return self._generate_blank_block(space_width, height)
 
+
     def generate_from_data(self, digits: Iterable):
 
         N = len(digits) # number of total digits in the sequence
@@ -246,14 +247,15 @@ class DigitSequenceImageGenerator(ImageGenerator):
 
         for index, digit in enumerate(digits):
 
-            # random sample a digit
+            # random sample a digit from digit dataset
             digit_image = self._dataset.random_sample_digit(digit)
 
             # get relevant content bounding box
             x0, _, x1, _ = helpers.calculate_binary_image_contents_bbox(digit_image)
 
             # crop digit contents on x axis
-            digit_image = digit_image[:,x0:x1]
+            # adding 1 extra pixel in x1 (x max coordinate) because it marks relevant data pixel and we need to crop background only.
+            digit_image = digit_image[:,x0:x1+1]
 
             intermediate_result_images.append(digit_image)
 
@@ -264,8 +266,10 @@ class DigitSequenceImageGenerator(ImageGenerator):
             random_spacing_block = self._generate_random_space_block()
             intermediate_result_images.append(random_spacing_block)
 
+        result = np.hstack(intermediate_result_images)
 
-        return np.hstack(intermediate_result_images)
+        # finally, rescale to desired output width
+        return helpers.rescale_to_width(result, self._output_image_width)
 
 def load_mnist_digit_dataset():
 

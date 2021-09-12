@@ -4,7 +4,65 @@ Provides image processing hepler functions to aid number_generator module.
 
 from typing import Tuple
 import numpy as np
+from PIL import Image
 
+def zero_pad_centered_axis(image: np.ndarray, axis: int, new_size: int):
+
+    """
+    Pads an image dimension in order to keep content centered in that dimension (or one pixel off in worst case)
+
+    Parameter
+    ---------
+    image: numpy 2d ndarray representing an monochromatic image
+
+    axis: the axis index representing the dimension to pad
+
+    new_size: the total new size after padding - new_size must be bigger than image dimension at choosen axis
+    """
+
+    current_size = image.shape[axis]
+    if current_size >= new_size:
+        return image
+
+    diff = (new_size - current_size)
+
+    pad_size =  diff // 2
+    pad_overflow = diff % 2 # if we cannot perfectly pad, put extra pixel on the right or image
+
+    # pad only given axis dimension
+
+    dims_pad = [(0,0), (0,0)]
+    dims_pad[axis] = (pad_size, pad_size + pad_overflow)
+    return np.pad(image, pad_width=dims_pad, mode='constant')
+
+def rescale_to_width(image: np.ndarray, new_width) -> np.ndarray:
+    """
+    Rescales image width keeping height fixed.
+    This happens by whether padding width with zeros on both sides, or rescaling width and padding height in both sides.
+    Original image contents aspect ratio is not affected
+    """
+
+    original_width, original_height = image.shape[1], image.shape[0]
+    if original_width == new_width:
+        return image
+
+    # if new_width is larger then input image, just pad it with background on both ends
+    if original_width < new_width:
+        return zero_pad_centered_axis(image, 1, new_width)
+
+    # original_width > new_width
+    # if output width is smaller, when we need to first rescale the image keeping aspect ratio,
+    # then insert rescaled image into a self._output_image_width x original_height image with vertical centering
+
+    scale_factor = new_width / original_width
+
+    pil_image = Image.fromarray(image)
+    pil_image = pil_image.resize((int(pil_image.width * scale_factor), int(pil_image.height * scale_factor)), Image.LANCZOS)
+
+    # now pad with zeros on y dimension to keep original height
+
+    image = np.array(pil_image)
+    return zero_pad_centered_axis(image, 0, original_height)
 
 def calculate_binary_image_contents_bbox(binary_image: np.ndarray) -> Tuple[int, int, int, int]:
     """
