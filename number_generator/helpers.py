@@ -3,16 +3,78 @@ Provides image processing hepler functions to aid number_generator module.
 """
 
 import numpy as np
-from PIL import Image
+from scipy.ndimage import gaussian_filter as scipy_gaussian
 from typing import Tuple
 
-def augment_digit_elastic_method(digit_image: np.ndarray) -> np.ndarray:
+
+def point_within_rect(p, x0, y0, width, height):
+    return p[0] >= x0 and p[1] >= y0 and p[0] <= x0 + width and p[1] <= y0 + height
+
+def gaussian_filter(image: np.ndarray, sigma:int = 1) -> np.ndarray:
+
+    return scipy_gaussian(image, sigma=sigma)
+
+def elastic_deformation(image: np.ndarray, sigma: int = 5, intensity: float = 20) -> np.ndarray:
     """
     Performs elastic augmentation on digit image
 
     Returns a new image containing the augmented data
+
+    Reference paper:
+    - Best Practices for Convolutional Neural Networks Applied to Visual Document Analysis
+
+    Parameters
+    ----------
+
+    image: a monochromatic (1 channel) image
+    sigma: the sigma of gaussian blur to apply into the displacement field
+    intensity: intensity of the elastic deformation
+
+    Taken from the above paper:
+
+        "If σ is small, the field looks like a completely random
+        field after normalization (as depicted in Figure 2, top right).
+        For intermediate σ values, the displacement fields look like
+        elastic deformation, where σ is the elasticity coefficient."
+
+        So we must choose good values of sigma value.
     """
-    pass
+
+    # empty images cannot be deformed
+    if image.size == 0:
+        return image
+
+    # 1) create a new buffer for the image
+    result = np.zeros_like(image)
+
+    # 2) create a displacement field for x and y following an uniform [-1,1] distribution
+    # map from [0,1] to [-1,1]
+    dx = np.random.rand(*image.shape) * 2 - 1
+    dy = np.random.rand(*image.shape) * 2 - 1
+
+    # # 3) smooth the direction field using gaussian
+
+    dx = gaussian_filter(dx, sigma=sigma)
+    dy = gaussian_filter(dy, sigma=sigma)
+
+    # 4) scale the displacement field
+    dx *= intensity
+    dy *= intensity
+
+    width, height = image.shape[::-1]
+
+    for displaced_y in range(height):
+        for displaced_x in range(width):
+            new_pos_x = int(displaced_x + dx[displaced_y, displaced_x])
+            new_pos_y = int(displaced_y + dy[displaced_y, displaced_x])
+
+            # check if diplaced point is within rectangle
+            if not point_within_rect((new_pos_x, new_pos_y), 0, 0, width-1, height-1):
+                continue
+
+            result[displaced_y, displaced_x]  = image[new_pos_y, new_pos_x]
+
+    return result
 
 def zero_pad_centered_axis(image: np.ndarray, axis: int, new_size: int):
 
