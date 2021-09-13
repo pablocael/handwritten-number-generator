@@ -255,9 +255,16 @@ class DigitSequenceImageGenerator(ImageGenerator):
         return self._generate_blank_block(space_width, height)
 
 
-    def generate_from_data(self, digits: Iterable):
+    def generate_from_data(self, digits: Iterable) -> np.ndarray:
+
+        """
+        Synthesize an image composed of handwritten digits from the input number sequence
+        """
 
         N = len(digits) # number of total digits in the sequence
+        if N == 0:
+            # if no digitis are given, returns a black strip (background only)
+            return np.ones((28, self._output_image_width), dtype=np.uint8) * 255
 
         # stores the intermediate generate sequence of images that corresponds to
         # each digit in input sequence plus spacer images
@@ -272,7 +279,6 @@ class DigitSequenceImageGenerator(ImageGenerator):
             x0, _, x1, _ = helpers.calculate_binary_image_contents_bbox(digit_image)
 
             # crop digit contents on x axis
-            # adding 1 extra pixel in x1 (x max coordinate) because it marks relevant data pixel and we need to crop background only.
             digit_image = digit_image[:,x0:x1+1]
 
             intermediate_result_images.append(digit_image)

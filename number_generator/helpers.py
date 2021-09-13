@@ -27,12 +27,17 @@ def zero_pad_centered_axis(image: np.ndarray, axis: int, new_size: int):
     diff = (new_size - current_size)
 
     pad_size =  diff // 2
-    pad_overflow = diff % 2 # if we cannot perfectly pad, put extra pixel on the right or image
+
+    # pad size is diff // 2
+    pad_left = pad_size
+
+    # pad right is the remaining pixels. this is needed because diff / 2 can have remaining of 1
+    pad_right = new_size - current_size - pad_size
 
     # pad only given axis dimension
 
     dims_pad = [(0,0), (0,0)]
-    dims_pad[axis] = (pad_size, pad_size + pad_overflow)
+    dims_pad[axis] = (pad_left, pad_right)
     return np.pad(image, pad_width=dims_pad, mode='constant')
 
 def rescale_to_width(image: np.ndarray, new_width) -> np.ndarray:
@@ -57,7 +62,10 @@ def rescale_to_width(image: np.ndarray, new_width) -> np.ndarray:
     scale_factor = new_width / original_width
 
     pil_image = Image.fromarray(image)
-    pil_image = pil_image.resize((int(pil_image.width * scale_factor), int(pil_image.height * scale_factor)), Image.LANCZOS)
+
+    scaled_width = int(np.round(pil_image.width * scale_factor))
+    secaled_height = int(np.round(pil_image.height * scale_factor))
+    pil_image = pil_image.resize((scaled_width, secaled_height), Image.LANCZOS)
 
     # now pad with zeros on y dimension to keep original height
 
