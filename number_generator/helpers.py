@@ -3,18 +3,15 @@ Provides image processing hepler functions to aid number_generator module.
 """
 
 import numpy as np
-from scipy.ndimage import gaussian_filter as scipy_gaussian
+from scipy.ndimage.interpolation import map_coordinates
+from scipy.ndimage import gaussian_filter as gaussian_filter
 from typing import Tuple
 
 
 def point_within_rect(p, x0, y0, width, height):
     return p[0] >= x0 and p[1] >= y0 and p[0] <= x0 + width and p[1] <= y0 + height
 
-def gaussian_filter(image: np.ndarray, sigma:int = 1) -> np.ndarray:
-
-    return scipy_gaussian(image, sigma=sigma)
-
-def elastic_deformation(image: np.ndarray, sigma: int = 5, intensity: float = 20) -> np.ndarray:
+def elastic_deformation(image, intensity, sigma, random_state=None):
     """
     Performs elastic augmentation on digit image
 
@@ -39,42 +36,20 @@ def elastic_deformation(image: np.ndarray, sigma: int = 5, intensity: float = 20
 
         So we must choose good values of sigma value.
     """
+    assert len(image.shape)==2
 
-    # empty images cannot be deformed
-    if image.size == 0:
-        return image
+    if random_state is None:
+        random_state = np.random.RandomState(None)
 
-    # 1) create a new buffer for the image
-    result = np.zeros_like(image)
+    shape = image.shape
 
-    # 2) create a displacement field for x and y following an uniform [-1,1] distribution
-    # map from [0,1] to [-1,1]
-    dx = np.random.rand(*image.shape) * 2 - 1
-    dy = np.random.rand(*image.shape) * 2 - 1
+    dx = gaussian_filter((random_state.rand(*shape) * 2 - 1), sigma, mode="constant", cval=0) * intensity
+    dy = gaussian_filter((random_state.rand(*shape) * 2 - 1), sigma, mode="constant", cval=0) * intensity
 
-    # # 3) smooth the direction field using gaussian
+    x, y = np.meshgrid(np.arange(shape[0]), np.arange(shape[1]), indexing='ij')
+    indices = np.reshape(x+dx, (-1, 1)), np.reshape(y+dy, (-1, 1))
 
-    dx = gaussian_filter(dx, sigma=sigma)
-    dy = gaussian_filter(dy, sigma=sigma)
-
-    # 4) scale the displacement field
-    dx *= intensity
-    dy *= intensity
-
-    width, height = image.shape[::-1]
-
-    for displaced_y in range(height):
-        for displaced_x in range(width):
-            new_pos_x = int(displaced_x + dx[displaced_y, displaced_x])
-            new_pos_y = int(displaced_y + dy[displaced_y, displaced_x])
-
-            # check if diplaced point is within rectangle
-            if not point_within_rect((new_pos_x, new_pos_y), 0, 0, width-1, height-1):
-                continue
-
-            result[displaced_y, displaced_x]  = image[new_pos_y, new_pos_x]
-
-    return result
+    return map_coordinates(image, indices, order=1).reshape(shape)
 
 def zero_pad_centered_axis(image: np.ndarray, axis: int, new_size: int):
 
