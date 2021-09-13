@@ -1,4 +1,5 @@
 import numpy as np
+
 from number_generator import core
 from number_generator import generate_numbers_sequence
 

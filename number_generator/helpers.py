@@ -2,9 +2,17 @@
 Provides image processing hepler functions to aid number_generator module.
 """
 
-from typing import Tuple
 import numpy as np
 from PIL import Image
+from typing import Tuple
+
+def augment_digit_elastic_method(digit_image: np.ndarray) -> np.ndarray:
+    """
+    Performs elastic augmentation on digit image
+
+    Returns a new image containing the augmented data
+    """
+    pass
 
 def zero_pad_centered_axis(image: np.ndarray, axis: int, new_size: int):
 

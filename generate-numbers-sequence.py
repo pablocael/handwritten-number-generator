@@ -7,8 +7,9 @@ Generate an image of handwritten digit sequences from an input string containing
 import os
 import sys
 import time
-from PIL import Image
 import argparse
+from PIL import Image
+
 from number_generator import generate_numbers_sequence
 
 if __name__ == '__main__':

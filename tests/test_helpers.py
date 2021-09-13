@@ -1,5 +1,5 @@
-from number_generator import helpers
 import numpy as np
+from number_generator import helpers
 
 def test_calculate_binary_image_contents_bbox():
 
@@ -14,7 +14,6 @@ def test_calculate_binary_image_contents_bbox():
     simple_bounds =  np.zeros((50, 50), dtype=np.uint8)
     simple_bounds[10,12] = 50
     simple_bounds[45,42] = 200
-
 
     bbox = helpers.calculate_binary_image_contents_bbox(simple_bounds)
 
@@ -47,6 +46,8 @@ def test_zero_pad_centered_axis():
     # assert the we pad zeros on the left and on the right
     # since image is all ones, we can check padding
     # lets use contents bbox detector for checking
-    x0, y0, x1, y1 = helpers.calculate_binary_image_contents_bbox(result)
+    x0, _, x1, _ = helpers.calculate_binary_image_contents_bbox(result)
+
+    # check if the relevant data size is correct after ignoring padding
     assert (x1 - x0)+1 == input_width
 

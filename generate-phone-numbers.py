@@ -10,6 +10,7 @@ import sys
 import time
 import argparse
 import numpy as np
+
 from number_generator.core import GenericDataset
 from number_generator import generate_numbers_sequence
 
