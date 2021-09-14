@@ -37,7 +37,7 @@ def test_zero_pad_centered_axis():
     input_width = 50
     input_height = 28
 
-    input_image = np.ones((28, input_width))
+    input_image = np.ones((input_height, input_width))
 
     result = helpers.zero_pad_centered_axis(input_image, 1, output_width)
     assert result.shape[1] == output_width
@@ -49,4 +49,7 @@ def test_zero_pad_centered_axis():
 
     # check if the relevant data size is correct after ignoring padding
     assert (x1 - x0)+1 == input_width
+
+    # image height should not be changed
+    assert result.shape[0] == input_height
 

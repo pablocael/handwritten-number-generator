@@ -137,7 +137,7 @@ print(metadata['creation_timestamp'])
 ### 2.2 Using custom digit datasets for generating phone-numbers:
 
 By default, number-generator package ships a native dataset based on MNIST. However, its possible change the default dataset to a user custom dataset, as long as the dataset is still composed by square images (width equal height). To change default database, set 'NG_DEFAULT_DIGIT_DATASET' environment variable to the path of the database. The custom database must be in the same format shown in item 2.1.
-See number_generator.core.DigitImageDataset for more information.
+See number\_generator.core.DigitImageDataset for more information.
 
 Example on how to change default input digit dataset:
 

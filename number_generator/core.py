@@ -20,6 +20,15 @@ this = sys.modules[__name__]
 
 this._DIGITS_DATASET_FILE = 'data/digits-dataset.pickle'
 
+# to allow configuration of default dataset
+# this must be called before any number generation functions call
+
+def set_default_dataset_filepath(filepath):
+    assert os.path.isfile(filepath), f'invalid default dataset path {filepath}'
+
+    this._DIGITS_DATASET_FILEPATH = filepath
+    return get_or_load_default_dataset(True)
+
 def resolve_default_dataset():
     # this dataset file resolving strategy allows direct usage of scripts withou installation or
     # through package installation
@@ -276,9 +285,9 @@ class DigitSequenceImageGenerator(ImageGenerator):
         # invert colors to make white background
         return 255 - rescaled
 
-def get_or_load_default_dataset():
+def get_or_load_default_dataset(force_reload=False):
 
-    if this._DIGITS_DATASET is None:
+    if force_reload or this._DIGITS_DATASET is None:
         this._DIGITS_DATASET = DigitImageDataset()
         this._DIGITS_DATASET.load(_DIGITS_DATASET_FILEPATH)
 
