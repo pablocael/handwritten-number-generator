@@ -17,6 +17,7 @@ This package installs two utility scripts:
 
 *This package is built for python >= 3.6*
 
+
 Installation
 ----------------------
 ```bash
@@ -27,12 +28,38 @@ pip3 install number-generator==0.0.1
 Dependencies
 ----------------------
 
+This package was build with a minimalist paradigm, trying to avoid bloatware package dependency.
+
+Dependencis are the following:
+
+- numpy >= 1.21.2
+
+	Necessary to perform array processing and mathematical operations
+ 	This package requires 93M of space.
+ 
+- pytest >= 6.2.5
+	
+	Necessary to perform unit tests
+	This package requires 1.9M of space.
+	
+- argparse >= 1.4.0
+
+	Argparse is used to handle input arguments in a more high level, scalable and organized fashion.
+	This package requires just a few KB of free space.
+	
+- Pillow >= 8.3.2
+
+	Necessary to save images in proper format.
+	This package requires 11M of space.
+
+
 Usage
 ----------------------
 
 #### 1. Generating a handwritten number a sequence from command line:
 
 Example:
+
 ```py
 generate-numbers-sequence --sequence=12345678 --min-spacing=5 --max-spacing=8 --image-width=200
 ```
@@ -52,6 +79,7 @@ the output image is saved in the current directory by default, but can be saved 
 #### 2. Generating a phone number sequences dataset from command line:
 
 Example:
+
 ```py
 generate-phone-numbers.py --num-images=200 --min-spacing=5 --max-spacing=10 --image-width=100 --output-path=./
 ```
@@ -83,6 +111,7 @@ The generated dataset is serialized with pickle in the given format:
 ```
 
 To load the dataset using pickle:
+
 ```py
 import pickle
 data = None
@@ -119,6 +148,7 @@ export NG_DEFAULT_DIGIT_DATASET='./mypath/my_digits_dataset.pickle'
 Help
 ----------------------
 Help info can be access by using the ```--help``` option:
+
 ```bash
 generate-numbers-sequence --help
 ```
