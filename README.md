@@ -6,14 +6,36 @@ Introduction
 
 *number-generator* is package for synthesizing handwritten sequences of digits, with digits randomly sampled from real handwritten digits dataset,
 
-It provides:
+Automatically generated handwritten digit sequences can be used for training OCR models without the need of manual work.
 
+The method for generating handwritten digit sequence adopted in this package is based on using a pre-defined digits dataset (called default digits dataset) to compose the sequences. For composing new sequences, digits are randomly sampled from the default digit dataset.
 
-This package installs two utility scripts:
+This package provides two utility scripts:
 
 - *generate-numbers-sequence*: generates individual number sequences with customized spacing range and output width
 
 - *generate-phone-numbers*: generates phone numbers-like number sequence datasets with custom number of examples
+
+By default, the natively shipped digit dataset will be used by the above scripts withou any configuration needed. The default digit dataset its based on the [MNIST dataset](https://data.deepai.org/mnist.zip).
+
+The default digit dataset, however, can be changed by user, as shown in section 2.2.
+
+This package also provides serveral utility classes within ```number_generator.core``` module. The utility classes are:
+
+- core.DigitImageDataset:
+	Allows easily loading / saving digits dataset as well as sampling digits from digit classes.
+	
+- core.DigitSequenceImageGenerator:
+	Allows building images of sequence of images based on an input dataset.
+	
+A convenience API for generating number sequence images is provided in the main module. How to use this api is shown in the example below:
+
+```py
+from number_generator import generate_numbers_sequence
+
+result_image = generate_number_sequence([1,2,3], spacing_range=(4,10), image_width=100)
+```
+
 
 *This package is built for python >= 3.6*
 
@@ -134,7 +156,7 @@ metadata = dataset.get_metadata()
 print(metadata['creation_timestamp'])
 ```
 
-### 2.2 Using custom digit datasets for generating phone-numbers:
+### 2.2 Using custom digit datasets:
 
 By default, number-generator package ships a native dataset based on MNIST. However, its possible change the default dataset to a user custom dataset, as long as the dataset is still composed by square images (width equal height). To change default database, set 'NG_DEFAULT_DIGIT_DATASET' environment variable to the path of the database. The custom database must be in the same format shown in item 2.1.
 See number\_generator.core.DigitImageDataset for more information.

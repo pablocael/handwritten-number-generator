@@ -38,6 +38,7 @@ def resolve_default_dataset():
         search_priorities.append(os.environ[dataset_path_env_var_name])
 
     search_priorities.append(this._DIGITS_DATASET_FILE)
+    search_priorities.append(os.path.join('/usr/local/', this._DIGITS_DATASET_FILE))
     search_priorities.append(os.path.join(sys.prefix, this._DIGITS_DATASET_FILE))
 
     for path in search_priorities:
