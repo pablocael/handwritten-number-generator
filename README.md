@@ -4,7 +4,7 @@
 Introduction
 ----------------------
 
-*number-generator* is package for synthesizing handwritten sequences of digits, with digits randomly sampled from real handwritten digits dataset,
+*number-generator* is package for synthesizing images of handwritten sequences of digits, with digits randomly sampled from real handwritten digits dataset.
 
 Automatically generated handwritten digit sequences can be used for training OCR models without the need of manual work.
 
@@ -16,9 +16,7 @@ This package provides two utility scripts:
 
 - *generate-phone-numbers*: generates phone numbers-like number sequence datasets with custom number of examples
 
-By default, the natively shipped digit dataset will be used by the above scripts withou any configuration needed. The default digit dataset its based on the [MNIST dataset](https://data.deepai.org/mnist.zip).
-
-The default digit dataset, however, can be changed by user, as shown in section 2.2.
+By default, the default digit dataset will be used by the above scripts without any configuration needed. The default digit dataset its based on the [MNIST dataset](https://data.deepai.org/mnist.zip). This default digit dataset, however, can be changed by user, as shown in section 2.2.
 
 This package also provides serveral utility classes within ```number_generator.core``` module. The utility classes are:
 
@@ -141,7 +139,7 @@ with open(input_filepath, 'rb') as handle:
 	data = pickle.load(handle)
 ```
 
-Alternativelly (and conviently) its possible to use a class ```core.GenericDataset``` to both load and save datasets:
+Alternativelly (and conveniently) its possible to use the class ```core.GenericDataset``` to both load and save datasets:
 
 ```py
 from number_generator.core import GenericDataset
@@ -158,7 +156,7 @@ print(metadata['creation_timestamp'])
 
 ### 2.2 Using custom digit datasets:
 
-By default, number-generator package ships a native dataset based on MNIST. However, its possible change the default dataset to a user custom dataset, as long as the dataset is still composed by square images (width equal height). To change default database, set 'NG_DEFAULT_DIGIT_DATASET' environment variable to the path of the database. The custom database must be in the same format shown in item 2.1.
+By default, number-generator package ships a native dataset based on MNIST. However, its possible change the default dataset to a user custom dataset, as long as the dataset is still composed by square images (width equals height). To change default database, set 'NG\_DEFAULT\_DIGIT\_DATASET' environment variable to the path of the database. The custom database must be in the same format shown in item 2.1.
 See number\_generator.core.DigitImageDataset for more information.
 
 Example on how to change default input digit dataset:
@@ -166,6 +164,16 @@ Example on how to change default input digit dataset:
 ```console
 export NG_DEFAULT_DIGIT_DATASET='./mypath/my_digits_dataset.pickle'
 ```
+
+One can also change default dataset programatically as shown below:
+
+```py
+from number_generator import set_default_dataset_filepath
+
+set_default_dataset_filepath('./mynewpath/mydataset.pickle')
+```
+
+This will force current default dataset to change.
 
 Help
 ----------------------
