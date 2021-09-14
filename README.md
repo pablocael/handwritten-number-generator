@@ -147,7 +147,10 @@ export NG_DEFAULT_DIGIT_DATASET='./mypath/my_digits_dataset.pickle'
 
 Help
 ----------------------
-Help info can be access by using the ```--help``` option:
+
+Support can be provided through email: pablo.cael@gmail.com.
+
+Executable scripts have help info can be access by using the ```--help``` option:
 
 ```bash
 generate-numbers-sequence --help

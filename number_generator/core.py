@@ -77,6 +77,20 @@ class GenericDataset:
         if 'metadata' in data:
             self._metadata = data['metadata']
 
+    def get_data(self):
+        return self._images, self._labels
+
+    def add_examples(self, images: np.ndarray, labels: Iterable):
+        """
+        Add more examples to this dataset
+        """
+
+        self._images = np.concatenate(self._images, images)
+        if type(self._labels) == np.array:
+            self._labels = np.concatenate(self._labels, labels)
+        else:
+            self._labels = self._labels + labels
+
     def get_metadata(self):
         return self._metadata
 
