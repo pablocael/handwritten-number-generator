@@ -3,53 +3,8 @@ Provides image processing hepler functions to aid number_generator module.
 """
 
 import numpy as np
-from scipy.ndimage.interpolation import map_coordinates
-from scipy.ndimage import gaussian_filter as gaussian_filter
+from PIL import Image
 from typing import Tuple
-
-
-def point_within_rect(p, x0, y0, width, height):
-    return p[0] >= x0 and p[1] >= y0 and p[0] <= x0 + width and p[1] <= y0 + height
-
-def elastic_deformation(image, intensity, sigma, random_state=None):
-    """
-    Performs elastic augmentation on digit image
-
-    Returns a new image containing the augmented data
-
-    Reference paper:
-    - Best Practices for Convolutional Neural Networks Applied to Visual Document Analysis
-
-    Parameters
-    ----------
-
-    image: a monochromatic (1 channel) image
-    sigma: the sigma of gaussian blur to apply into the displacement field
-    intensity: intensity of the elastic deformation
-
-    Taken from the above paper:
-
-        "If σ is small, the field looks like a completely random
-        field after normalization (as depicted in Figure 2, top right).
-        For intermediate σ values, the displacement fields look like
-        elastic deformation, where σ is the elasticity coefficient."
-
-        So we must choose good values of sigma value.
-    """
-    assert len(image.shape)==2
-
-    if random_state is None:
-        random_state = np.random.RandomState(None)
-
-    shape = image.shape
-
-    dx = gaussian_filter((random_state.rand(*shape) * 2 - 1), sigma, mode="constant", cval=0) * intensity
-    dy = gaussian_filter((random_state.rand(*shape) * 2 - 1), sigma, mode="constant", cval=0) * intensity
-
-    x, y = np.meshgrid(np.arange(shape[0]), np.arange(shape[1]), indexing='ij')
-    indices = np.reshape(x+dx, (-1, 1)), np.reshape(y+dy, (-1, 1))
-
-    return map_coordinates(image, indices, order=1).reshape(shape)
 
 def zero_pad_centered_axis(image: np.ndarray, axis: int, new_size: int):
 

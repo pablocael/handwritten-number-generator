@@ -25,7 +25,6 @@ def test_calculate_binary_image_contents_bbox():
     simple_bounds[0, 0] = 50
     simple_bounds[99, 99] = 200
 
-
     bbox = helpers.calculate_binary_image_contents_bbox(simple_bounds)
 
     # bbox of empty image (background only) should be all zeros

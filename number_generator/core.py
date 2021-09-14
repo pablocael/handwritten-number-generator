@@ -7,9 +7,7 @@ import sys
 import pickle
 import logging
 import numpy as np
-from enum import IntFlag, auto
 from typing import Iterable, Tuple
-from collections.abc import Iterable
 
 from . import helpers
 
@@ -20,18 +18,38 @@ this = sys.modules[__name__]
 
 # will be loaded on demand, first time needed
 
-this._DIGITS_DATASET_FILEPATH = os.path.join(sys.prefix, 'data/digits-dataset.pickle')
+this._DIGITS_DATASET_FILE = 'data/digits-dataset.pickle'
+
+def resolve_default_dataset():
+    # this dataset file resolving strategy allows direct usage of scripts withou installation or
+    # through package installation
+    search_priorities = []
+    dataset_path_env_var_name = 'NG_DEFAULT_DIGIT_DATASET'
+    if dataset_path_env_var_name in os.environ:
+        search_priorities.append(os.environ[dataset_path_env_var_name])
+
+    search_priorities.append(this._DIGITS_DATASET_FILE)
+    search_priorities.append(os.path.join(sys.prefix, this._DIGITS_DATASET_FILE))
+
+    for path in search_priorities:
+
+        if os.path.isfile(path):
+            return path
+
+    raise ValueError('could not initialize default digit dataset, package might be corrupted')
+
+this._DIGITS_DATASET_FILEPATH = resolve_default_dataset()
 this._DIGITS_DATASET = None
 
 class GenericDataset:
 
-    def __init__(self, labels=None, images=None, metadata=None):
+    def __init__(self, images=None, labels=None, metadata=None):
         """
         A generic dataset that can store and retrieve examples and labels
         """
 
-        self._labels = labels or []
-        self._images = images or []
+        self._labels = labels if labels is not None else []
+        self._images = images if images is not None else []
         self._sample_shape = (0,0)
         self._metadata = metadata or {}
 
@@ -73,7 +91,7 @@ class DigitImageDataset(GenericDataset):
     """
     Stores image examples for digits in interval [0,9].
     """
-    def __init__(self, labels: np.array = None, images: np.ndarray = None):
+    def __init__(self, images: np.ndarray = None, labels: np.array = None):
         """
         Construct a digit dataset from list of examples and labels
 
@@ -91,12 +109,15 @@ class DigitImageDataset(GenericDataset):
         """
 
         super(DigitImageDataset, self).__init__(labels=labels, images=images)
+
         self._initialize_digits_set(labels=labels, images=images)
 
     def _initialize_digits_set(self, labels: np.array, images: np.ndarray):
 
         if labels is None or images is None:
             return
+
+        assert images.shape[1] == images.shape[2], f'digits datasets must have square dimension image examples: given dataset images have dimensions (width, height) = {images.shape[1:][::-1]}'
 
         # create a dictionary to store classes examples
         self._digit_examples = {}
@@ -132,97 +153,6 @@ class DigitImageDataset(GenericDataset):
         super(DigitImageDataset, self).load(input_filepath)
 
         self._initialize_digits_set(labels=self._labels, images=self._images)
-
-class DigitAugmentationMethod(IntFlag):
-    AUGMENTATION_METHOD_ELASTIC = auto()
-    AUGMENTATION_METHOD_AFFINE = auto()
-    AUGMENTATION_METHOD_NOISE = auto()
-    AUGMENTATION_METHOD_ALL = AUGMENTATION_METHOD_AFFINE | AUGMENTATION_METHOD_NOISE | AUGMENTATION_METHOD_ELASTIC
-
-class DigitImageDatasetAugmentator(DigitImageDataset):
-    """
-    A special digit dataset that will augment the data by using digit deformation
-    """
-
-    def __init__(self, labels: np.array = None, images: np.ndarray = None, percent_augmentation: float = 1, augmentation_method: DigitAugmentationMethod=DigitAugmentationMethod.AUGMENTATION_METHOD_ELASTIC):
-
-        if augmentation_method not in DigitImageDatasetAugmentator.__accepted_augmentation_methods:
-            raise ValueError(f'augmentation_method must be one of the following: {DigitImageDatasetAugmentator.__accepted_augmentation_methods}')
-
-        super(DigitImageDatasetAugmentator, self).__init__(labels, images)
-        """
-        Construct a digit dataset from list of examples and labels and augments the data
-
-        Parameters
-        ----------
-
-        labels:
-        a np.array of type uint8 storing each image digit example label
-
-        images:
-        digit examples in a numpy array with format (N, height, width), where N is the number of examples
-
-
-        labels length and images.shape[0] must have same size
-
-        percent_augmentation:
-        the percentage, related to original dataset size, of new examples to generate
-        if percent_augmentation==1, then the dataset size will be doubled
-
-        augmentation_method:
-        the augmentation method to use.
-
-        - elastic: augment digits by deforming it's shape by using an non-rigid transformation
-            (see reference "Best Practices for Convolutional Neural Networks Applied to Visual Document Analysis")
-
-        - affine: randomly translates and rotates each example
-
-        - noise: adds noise to examples
-        """
-
-        assert percent_augmentation > 0 and percent_augmentation <= 1, 'percent_augmentation must be a value in (0,1] interval, which is, percent_augmentation > 0 and percent_augmentation <= 1'
-
-        self._percent_augmentation = percent_augmentation
-        self._augmentation_method = augmentation_method
-
-
-    def perform_data_augmentation(self):
-
-        """
-        Performs digit data augmentation using current dataset examples and settings passed at construct time.
-        Note that if this method is be called multiple times and more data augmentation will be generated, but possible data will be augmented twice (augmentation over augmented data).
-        """
-
-        input_examples, input_labels = self._collect_input_examples()
-
-        # begin augmentation process
-        flags = [DigitAugmentationMethod.AUGMENTATION_METHOD_ELASTIC, DigitAugmentationMethod.AUGMENTATION_METHOD_AFFINE, DigitAugmentationMethod.AUGMENTATION_METHOD_NOISE]
-        for f in flags:
-            if f not in self._augmentation_method:
-                continue
-
-    def _generate_augmented_examples(self, images: np.ndarray, augmentation_method):
-        """
-        Augment input example images inplace using the given augmentation_method
-        """
-
-        pass
-
-    def _collect_input_examples(self):
-        """
-        Collect the input data for augmentation process.
-        This method will randomly sample examples from each class until percent_augmentation is satisfyied.
-        """
-
-        N = self._images.shape[0] # original number of examples
-        num_new_examples = int(np.ceil(N * self._percent_augmentation))
-
-        choosen_indices = np.random.choice(np.arange(N), size=num_new_examples, replace=False)
-
-        input_images = self._images[choosen_indices]
-        input_labels = self._labels[choosen_indices]
-
-        return input_images, input_labels
 
 
 class ImageGenerator:
@@ -332,7 +262,7 @@ class DigitSequenceImageGenerator(ImageGenerator):
         # invert colors to make white background
         return 255 - rescaled
 
-def get_or_load_digits_dataset():
+def get_or_load_default_dataset():
 
     if this._DIGITS_DATASET is None:
         this._DIGITS_DATASET = DigitImageDataset()
@@ -367,7 +297,7 @@ def generate_numbers_sequence(digits: Iterable[int], spacing_range: Tuple[int, i
     """
 
     # load digits dataset
-    digits_dataset = get_or_load_digits_dataset()
+    digits_dataset = get_or_load_default_dataset()
 
     # Generate the synthetic sequence using the digit dataset created
     digit_sequence_generator = DigitSequenceImageGenerator(digits_dataset, spacing_range=spacing_range, output_image_width=image_width)

@@ -91,7 +91,7 @@ if __name__ == '__main__':
             generate_image = generate_numbers_sequence(sequence, spacing_range=(min_spacing, max_spacing), image_width=image_width)
             images.append(generate_image)
 
-        dataset = GenericDataset(labels, images)
+        dataset = GenericDataset(labels=labels, images=np.array(images))
 
         output_filename = os.path.join(output_path, f'phonenumbers-handwritten-dataset-{num_images}.pickle')
 
@@ -110,6 +110,7 @@ if __name__ == '__main__':
     except Exception as e:
         print('an error occurred while trying to generate the dataset:', e)
         print('please contact pablo.cael@gmail.com for support')
+        raise e
 
 
     print()

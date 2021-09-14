@@ -35,9 +35,10 @@ Usage
 Example:
 ```py
 generate-numbers-sequence --sequence=12345678 --min-spacing=5 --max-spacing=8 --image-width=200
-````
+```
 
 Output:
+
 ```console
 ---------------------------
 Digits sequence generator
@@ -48,14 +49,15 @@ Image of dimensions 200 x 28 generated successfully at "./12345678.png", procces
 
 the output image is saved in the current directory by default, but can be saved in any other directory by specifying the option ```--output-path```
 
-#### 2. Generating a dataset from command line:
+#### 2. Generating a phone number sequences dataset from command line:
 
 Example:
 ```py
 generate-phone-numbers.py --num-images=200 --min-spacing=5 --max-spacing=10 --image-width=100 --output-path=./
-````
+```
 
 Output:
+
 ```console
 ---------------------------------
 Phone numbers dataset generator
@@ -64,7 +66,7 @@ Creating phone numbers like database with 200 examples, this might take a few mo
 Dataset with 200 telephone like images generated successfully at "./phonenumbers-handwritten-dataset-200.pickle", proccess took 0.3 seconds...
 ```
 
-### 2.1 Using the generated dataset:
+### 2.1 Using the generated phone number sequences dataset:
 
 The generated dataset is serialized with pickle in the given format:
 
@@ -82,6 +84,8 @@ The generated dataset is serialized with pickle in the given format:
 
 To load the dataset using pickle:
 ```py
+import pickle
+data = None
 with open(input_filepath, 'rb') as handle:
 	data = pickle.load(handle)
 ```
@@ -99,6 +103,17 @@ img, label = dataset[0]
 # read metadata
 metadata = dataset.get_metadata()
 print(metadata['creation_timestamp'])
+```
+
+### 2.2 Using custom digit datasets for generating phone-numbers:
+
+By default, number-generator package ships a native dataset based on MNIST. However, its possible change the default dataset to a user custom dataset, as long as the dataset is still composed by square images (width equal height). To change default database, set 'NG_DEFAULT_DIGIT_DATASET' environment variable to the path of the database. The custom database must be in the same format shown in item 2.1.
+See number_generator.core.DigitImageDataset for more information.
+
+Example on how to change default input digit dataset:
+
+```console
+export NG_DEFAULT_DIGIT_DATASET='./mypath/my_digits_dataset.pickle'
 ```
 
 Help
@@ -134,7 +149,7 @@ number-generator uses pytest. To run the tests, run:
 
 ```py
 python3 -m pytest
-````
+```
 
 on the root directory.
 
@@ -143,5 +158,5 @@ Future Improvement and Features
 ----------------------
 
 1. Genereate phone numbers with dashes between number blocks
-2. Generate number sequences using similar handwritten characters: this can be achieved by clustering each digit class using k-means and randomly choosing a fixed cluster for each class (or maybe more than one cluster, based on similarity)
+2. Generate number sequences using similar handwritten characters (to simulate same person writting the sequence): this can be achieved by clustering each digit class using k-means and randomly choosing a fixed cluster for each class (or maybe more than one cluster, based on similarity)
 
