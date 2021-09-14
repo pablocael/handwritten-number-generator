@@ -202,7 +202,7 @@ required arguments:
 
 optional arguments:
   --output-path OUTPUT_PATH
-                        The path where to store the genereate dataset images
+                        The path where to store the generated dataset images
 ```
 Development
 ----------------------

@@ -44,7 +44,7 @@ if __name__ == '__main__':
     arggroup.add_argument('--num-images', dest='num_images', type=int,
                         help='The number of images to generate within the dataset', required=True)
     arggroup.add_argument('--output-path', dest='output_path', type=str,
-                        help='The path where to store the genereate dataset images', required=True)
+                        help='The path where to store the generated dataset images', required=True)
 
     min_spacing = None
     max_spacing = None
