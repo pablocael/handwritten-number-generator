@@ -221,5 +221,5 @@ Future Improvement and Features
 ----------------------
 
 1. Genereate phone numbers with dashes between number blocks
-2. Generate number sequences using similar handwritten characters (to simulate same person writting the sequence): this can be achieved by clustering each digit class using k-means and randomly choosing a fixed cluster for each class (or maybe more than one cluster, based on similarity)
+2. Generate number sequences using similar handwritten characters (to simulate same person writing the sequence): this can be achieved by clustering each digit class using k-means and randomly choosing a fixed cluster for each class (or maybe more than one cluster, based on similarity)
 
