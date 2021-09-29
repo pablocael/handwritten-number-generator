@@ -30,7 +30,7 @@ def set_default_dataset_filepath(filepath):
     return get_or_load_default_dataset(True)
 
 def resolve_default_dataset():
-    # this dataset file resolving strategy allows direct usage of scripts withou installation or
+    # this dataset file resolving strategy allows direct usage of scripts without installation or
     # through package installation
     search_priorities = []
     dataset_path_env_var_name = 'NG_DEFAULT_DIGIT_DATASET'
@@ -181,7 +181,7 @@ class DigitImageDataset(GenericDataset):
 
 class ImageGenerator:
 
-    def generate_from_data(data: Iterable) -> np.ndarray:
+    def generate_from_data(self, data: Iterable) -> np.ndarray:
         """
         To be reimplemented by concrete implementations of ImageGenerator.
 
@@ -193,7 +193,7 @@ class ImageGenerator:
 class DigitSequenceImageGenerator(ImageGenerator):
 
     """
-    NumberSequenceGenerator class
+    DigitSequenceGenerator class
 
     Inherits from ImageGenerator.
 
