@@ -4,6 +4,8 @@
 Introduction
 ----------------------
 
+**This is a toy project for playing around with handwritten number generation.**
+
 *number-generator* is package for synthesizing images of handwritten sequences of digits, with digits randomly sampled from real handwritten digits dataset.
 
 Automatically generated handwritten digit sequences can be used for training OCR models without the need of manual work.
